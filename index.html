@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Banner Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .control-group {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        .preset-color {
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+        .preset-color:hover {
+            border-color: #999 !important;
+            transform: scale(1.1);
+        }
+        .preset-color.active {
+            border-color: #333 !important;
+            border-width: 3px !important;
+        }
+        .canvas-container {
+            text-align: center;
+            margin: 20px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+        }
+        canvas {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            margin-top: 15px;
+        }
+        .download-all-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            margin-top: 15px;
+            margin-left: 10px;
+        }
+        .format-selector {
+            margin-top: 10px;
+        }
+        .format-selector select {
+            width: auto;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .safe-area-info {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Social Media Banner Generator</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="platform">Platform:</label>
+                <select id="platform">
+                    <option value="twitter">Twitter (1500x500)</option>
+                    <option value="mastodon">Mastodon (1500x500)</option>
+                    <option value="bluesky">Bluesky (1500x500)</option>
+                    <option value="linkedin_company">LinkedIn Company (1128x191)</option>
+                    <option value="linkedin_group">LinkedIn Group (1774x444)</option>
+                    <option value="youtube">YouTube (2560x1440)</option>
+
+                    <option value="blog">EP Blog (1900x550)</option>
+                    <option value="google_form">Google Form (1600x400)</option>
+                    <option value="devto">Dev.to (1000x420)</option>
+                    <option value="social_cards">Social Cards (1686x888)</option>
+                    <option value="pretalx">Pretalx (1129x191)</option>
+
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="logoUpload">Upload Logo:</label>
+                <input type="file" id="logoUpload" accept="image/*">
+            </div>
+            
+            <div class="control-group">
+                <label for="bgColor">Background Color:</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button type="button" class="preset-color" data-color="#edd9db" style="background: #667eea; border: 2px solid #ddd; border-radius: 6px; width: 40px; height: 30px; cursor: pointer;"></button>
+                    <button type="button" class="preset-color" data-color="#151f38" style="background: #ff6b6b; border: 2px solid #ddd; border-radius: 6px; width: 40px; height: 30px; cursor: pointer;"></button>
+                    <button type="button" class="preset-color" data-color="#f5efd6" style="background: #4ecdc4; border: 2px solid #ddd; border-radius: 6px; width: 40px; height: 30px; cursor: pointer;"></button>
+                </div>
+                <input type="color" id="bgColor" value="#667eea">
+            </div>
+            
+            <div class="control-group">
+                <label for="logoSize">Logo Size (%):</label>
+                <input type="range" id="logoSize" min="10" max="80" value="30">
+                <span id="logoSizeValue">30%</span>
+            </div>
+        </div>
+        
+        <button onclick="generateBanner()">Generate Banner</button>
+        
+        <div class="canvas-container">
+            <canvas id="bannerCanvas"></canvas>
+            <div class="format-selector" id="formatSelector" style="display:none;">
+                <label for="downloadFormat">Download Format:</label>
+                <select id="downloadFormat">
+                    <option value="png">PNG</option>
+                    <option value="svg">SVG</option>
+                </select>
+            </div>
+            <br>
+            <button class="download-btn" onclick="downloadBanner()" style="display:none;" id="downloadBtn">
+                📥 Download Banner
+            </button>
+            <button class="download-all-btn" onclick="downloadAllBanners()" style="display:none;" id="downloadAllBtn">
+                📦 Download All Platforms
+            </button>
+        </div>
+        
+        <div class="safe-area-info" id="safeAreaInfo" style="display:none;"></div>
+    </div>
+
+    <script>
+        const platformConfigs = {
+            twitter: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
+            mastodon: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
+            bluesky: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
+            linkedin_company: { width: 1128, height: 191, safeArea: { x: 300, y: 0, width: 828, height: 191 } },
+            linkedin_group: { width: 1774, height: 444, safeArea: { x: 600, y: 0, width: 1174, height: 444 } },
+            youtube: { width: 2560, height: 1440, safeArea: { x: 757, y: 423, width: 1046, height: 594 } },
+            blog: { width: 1900, height: 550, safeArea: { x: 600, y: 0, width: 1300, height: 550 } },
+            google_form: { width: 1600, height: 400, safeArea: { x: 0, y: 0, width: 1600, height: 400 } },
+            devto: { width: 1000, height: 420, safeArea: { x: 0, y: 0, width: 1000, height: 420 } },
+            social_cards: { width: 1686, height: 888, safeArea: { x: 0, y: 0, width: 1686, height: 888 } },
+            pretalx: { width: 1129, height: 191, safeArea: { x: 300, y: 0, width: 829, height: 191 } }
+        };
+
+        let uploadedLogo = null;
+        let logoDataUrl = null;
+
+        document.getElementById('logoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        uploadedLogo = img;
+                        logoDataUrl = e.target.result;
+                        generateBanner();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('logoSize').addEventListener('input', function() {
+            document.getElementById('logoSizeValue').textContent = this.value + '%';
+            if (uploadedLogo) generateBanner();
+        });
+
+        document.getElementById('bgColor').addEventListener('change', function() {
+            updatePresetButtons();
+            if (uploadedLogo) generateBanner();
+        });
+
+        document.getElementById('platform').addEventListener('change', function() {
+            if (uploadedLogo) generateBanner();
+        });
+
+        // Preset color buttons
+        document.querySelectorAll('.preset-color').forEach(button => {
+            button.addEventListener('click', function() {
+                const color = this.dataset.color;
+                document.getElementById('bgColor').value = color;
+                updatePresetButtons();
+                if (uploadedLogo) generateBanner();
+            });
+        });
+
+        function updatePresetButtons() {
+            const currentColor = document.getElementById('bgColor').value;
+            document.querySelectorAll('.preset-color').forEach(button => {
+                if (button.dataset.color === currentColor) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
+        function generateBanner() {
+            const canvas = document.getElementById('bannerCanvas');
+            const ctx = canvas.getContext('2d');
+            const platform = document.getElementById('platform').value;
+            const config = platformConfigs[platform];
+            const bgColor = document.getElementById('bgColor').value;
+            const logoSizePercent = parseInt(document.getElementById('logoSize').value);
+
+            canvas.width = config.width;
+            canvas.height = config.height;
+
+            // background 
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // draw safe area outline
+            if (config.safeArea) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.setLineDash([10, 5]);
+                ctx.lineWidth = 2;
+                ctx.strokeRect(config.safeArea.x, config.safeArea.y, config.safeArea.width, config.safeArea.height);
+                ctx.setLineDash([]);
+            }
+
+            if (uploadedLogo) {
+                const safeArea = config.safeArea || { x: 0, y: 0, width: canvas.width, height: canvas.height };
+                
+                const maxLogoSize = Math.min(safeArea.width, safeArea.height) * (logoSizePercent / 100);
+                const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
+                
+                let logoWidth, logoHeight;
+                if (logoAspectRatio > 1) {
+                    logoWidth = maxLogoSize;
+                    logoHeight = maxLogoSize / logoAspectRatio;
+                } else {
+                    logoHeight = maxLogoSize;
+                    logoWidth = maxLogoSize * logoAspectRatio;
+                }
+
+                // center logo in safe area
+                const logoX = safeArea.x + (safeArea.width - logoWidth) / 2;
+                const logoY = safeArea.y + (safeArea.height - logoHeight) / 2;
+
+                ctx.drawImage(uploadedLogo, logoX, logoY, logoWidth, logoHeight);
+            }
+
+            document.getElementById('downloadBtn').style.display = 'inline-block';
+            document.getElementById('downloadAllBtn').style.display = 'inline-block';
+            document.getElementById('formatSelector').style.display = 'block';
+            const infoDiv = document.getElementById('safeAreaInfo');
+            infoDiv.style.display = 'block';
+            infoDiv.innerHTML = `
+                <strong>Platform:</strong> ${platform.replace('_', ' ').toUpperCase()}<br>
+                <strong>Canvas Size:</strong> ${config.width} × ${config.height}px<br>
+                ${config.safeArea ? `<strong>Safe Area:</strong> ${config.safeArea.width} × ${config.safeArea.height}px (starting at ${config.safeArea.x}, ${config.safeArea.y})` : '<strong>Safe Area:</strong> Full canvas'}
+            `;
+        }
+
+        function createSVG(platform, config, bgColor, logoSizePercent) {
+            const { width, height } = config;
+            const safeArea = config.safeArea || { x: 0, y: 0, width: width, height: height };
+            
+            let svgContent = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`;
+            
+            // background
+            svgContent += `<rect width="${width}" height="${height}" fill="${bgColor}"/>`;
+            
+            // safe area outline (optional, for reference)
+            svgContent += `<rect x="${safeArea.x}" y="${safeArea.y}" width="${safeArea.width}" height="${safeArea.height}" 
+                          fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="10,5"/>`;
+            
+            if (uploadedLogo && logoDataUrl) {
+                const maxLogoSize = Math.min(safeArea.width, safeArea.height) * (logoSizePercent / 100);
+                const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
+                
+                let logoWidth, logoHeight;
+                if (logoAspectRatio > 1) {
+                    logoWidth = maxLogoSize;
+                    logoHeight = maxLogoSize / logoAspectRatio;
+                } else {
+                    logoHeight = maxLogoSize;
+                    logoWidth = maxLogoSize * logoAspectRatio;
+                }
+
+                const logoX = safeArea.x + (safeArea.width - logoWidth) / 2;
+                const logoY = safeArea.y + (safeArea.height - logoHeight) / 2;
+
+                svgContent += `<image x="${logoX}" y="${logoY}" width="${logoWidth}" height="${logoHeight}" 
+                              xlink:href="${logoDataUrl}"/>`;
+            }
+            
+            svgContent += '</svg>';
+            return svgContent;
+        }
+
+        function downloadBanner() {
+            const format = document.getElementById('downloadFormat').value;
+            const platform = document.getElementById('platform').value;
+            
+            if (format === 'svg') {
+                const config = platformConfigs[platform];
+                const bgColor = document.getElementById('bgColor').value;
+                const logoSizePercent = parseInt(document.getElementById('logoSize').value);
+                
+                const svgContent = createSVG(platform, config, bgColor, logoSizePercent);
+                
+                const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.download = `banner_${platform}_${Date.now()}.svg`;
+                link.href = url;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            } else {
+                // PNG
+                const canvas = document.getElementById('bannerCanvas');
+                const link = document.createElement('a');
+                link.download = `banner_${platform}_${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        async function downloadAllBanners() {
+            const format = document.getElementById('downloadFormat').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const logoSizePercent = parseInt(document.getElementById('logoSize').value);
+            const currentPlatform = document.getElementById('platform').value;
+            
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            const zip = new JSZip();
+            const timestamp = Date.now();
+            
+            for (const [platform, config] of Object.entries(platformConfigs)) {
+                if (format === 'svg') {
+                    const svgContent = createSVG(platform, config, bgColor, logoSizePercent);
+                    zip.file(`${platform}_banner.svg`, svgContent);
+                } else {
+                    tempCanvas.width = config.width;
+                    tempCanvas.height = config.height;
+                    
+                    tempCtx.fillStyle = bgColor;
+                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    
+                    if (config.safeArea) {
+                        tempCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                        tempCtx.setLineDash([10, 5]);
+                        tempCtx.lineWidth = 2;
+                        tempCtx.strokeRect(config.safeArea.x, config.safeArea.y, config.safeArea.width, config.safeArea.height);
+                        tempCtx.setLineDash([]);
+                    }
+                    
+                    if (uploadedLogo) {
+                        const safeArea = config.safeArea || { x: 0, y: 0, width: tempCanvas.width, height: tempCanvas.height };
+                        const maxLogoSize = Math.min(safeArea.width, safeArea.height) * (logoSizePercent / 100);
+                        const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
+                        
+                        let logoWidth, logoHeight;
+                        if (logoAspectRatio > 1) {
+                            logoWidth = maxLogoSize;
+                            logoHeight = maxLogoSize / logoAspectRatio;
+                        } else {
+                            logoHeight = maxLogoSize;
+                            logoWidth = maxLogoSize * logoAspectRatio;
+                        }
+
+                        const logoX = safeArea.x + (safeArea.width - logoWidth) / 2;
+                        const logoY = safeArea.y + (safeArea.height - logoHeight) / 2;
+
+                        tempCtx.drawImage(uploadedLogo, logoX, logoY, logoWidth, logoHeight);
+                    }
+                    
+                    const dataUrl = tempCanvas.toDataURL('image/png');
+                    const base64Data = dataUrl.split(',')[1];
+                    zip.file(`${platform}_banner.png`, base64Data, { base64: true });
+                }
+            }
+            
+            try {
+                const content = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(content);
+                
+                const link = document.createElement('a');
+                link.download = `social_banners_${format}_${timestamp}.zip`;
+                link.href = url;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error creating zip:', error);
+                alert('Error creating download. Please try downloading banners individually.');
+            }
+        }
+
+        function downloadBanner() {
+            const format = document.getElementById('downloadFormat').value;
+            const platform = document.getElementById('platform').value;
+            
+            if (format === 'svg') {
+                const config = platformConfigs[platform];
+                const bgColor = document.getElementById('bgColor').value;
+                const logoSizePercent = parseInt(document.getElementById('logoSize').value);
+                
+                const svgContent = createSVG(platform, config, bgColor, logoSizePercent);
+                
+                const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.download = `banner_${platform}_${Date.now()}.svg`;
+                link.href = url;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            } else {
+                const canvas = document.getElementById('bannerCanvas');
+                const link = document.createElement('a');
+                link.download = `banner_${platform}_${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        function createDefaultLogo() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 600;
+            canvas.height = 600;
+            
+            const gradient = ctx.createRadialGradient(300, 300, 0, 300, 300, 300);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(300, 300, 250, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('LOGO', 300, 300);
+            
+            const img = new Image();
+            img.onload = function() {
+                uploadedLogo = img;
+                logoDataUrl = canvas.toDataURL();
+                generateBanner();
+            };
+            img.src = canvas.toDataURL();
+        }
+
+        createDefaultLogo();
+        updatePresetButtons();
+    </script>
+    
+    <!-- JSZip library for creating zip files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</body>
+</html>
