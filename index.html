@@ -131,6 +131,7 @@
                     <option value="devto">Dev.to (1000x420)</option>
                     <option value="social_cards">Social Cards (1686x888)</option>
                     <option value="pretalx">Pretalx (1129x191)</option>
+                    <option value="a4_letterhead">A4 Letterhead (3307x630)</option>
 
                 </select>
             </div>
@@ -184,15 +185,16 @@
         const platformConfigs = {
             twitter: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
             mastodon: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
-            bluesky: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
+            bluesky: { width: 1500, height: 500, safeArea: { x: 0, y: 0, width: 1500, height: 500 } },
             linkedin_company: { width: 1128, height: 191, safeArea: { x: 300, y: 0, width: 828, height: 191 } },
-            linkedin_group: { width: 1774, height: 444, safeArea: { x: 600, y: 0, width: 1174, height: 444 } },
+            linkedin_group: { width: 1774, height: 444, safeArea: { x: 0, y: 0, width: 1774, height: 444 } },
             youtube: { width: 2560, height: 1440, safeArea: { x: 757, y: 423, width: 1046, height: 594 } },
             blog: { width: 1900, height: 550, safeArea: { x: 600, y: 0, width: 1300, height: 550 } },
             google_form: { width: 1600, height: 400, safeArea: { x: 0, y: 0, width: 1600, height: 400 } },
             devto: { width: 1000, height: 420, safeArea: { x: 0, y: 0, width: 1000, height: 420 } },
             social_cards: { width: 1686, height: 888, safeArea: { x: 0, y: 0, width: 1686, height: 888 } },
-            pretalx: { width: 1129, height: 191, safeArea: { x: 300, y: 0, width: 829, height: 191 } }
+            pretalx: { width: 1129, height: 191, safeArea: { x: 300, y: 0, width: 829, height: 191 } },
+            a4_letterhead: { width: 3307, height: 630, safeArea: { x: 0, y: 0, width: 3307, height: 630 } }
         };
 
         let uploadedLogo = null;
