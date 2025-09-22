@@ -183,17 +183,17 @@
 
     <script>
         const platformConfigs = {
-            twitter: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
-            mastodon: { width: 1500, height: 500, safeArea: { x: 600, y: 0, width: 900, height: 500 } },
+            twitter: { width: 1500, height: 500, safeArea: { x: 400, y: 0, width: 900, height: 380 } },
+            mastodon: { width: 1500, height: 500, safeArea: { x: 400, y: 0, width: 900, height: 380 } },
             bluesky: { width: 1500, height: 500, safeArea: { x: 0, y: 0, width: 1500, height: 500 } },
-            linkedin_company: { width: 1128, height: 191, safeArea: { x: 300, y: 0, width: 828, height: 191 } },
+            linkedin_company: { width: 1128, height: 191, safeArea: { x: 220, y: 16, width: 888, height: 159 } },
             linkedin_group: { width: 1774, height: 444, safeArea: { x: 0, y: 0, width: 1774, height: 444 } },
             youtube: { width: 2560, height: 1440, safeArea: { x: 757, y: 423, width: 1046, height: 594 } },
-            blog: { width: 1900, height: 550, safeArea: { x: 600, y: 0, width: 1300, height: 550 } },
+            blog: { width: 1900, height: 550, safeArea: { x: 400, y: 0, width: 1100, height: 550 } },
             google_form: { width: 1600, height: 400, safeArea: { x: 0, y: 0, width: 1600, height: 400 } },
             devto: { width: 1000, height: 420, safeArea: { x: 0, y: 0, width: 1000, height: 420 } },
             social_cards: { width: 1686, height: 888, safeArea: { x: 0, y: 0, width: 1686, height: 888 } },
-            pretalx: { width: 1129, height: 191, safeArea: { x: 300, y: 0, width: 829, height: 191 } },
+            pretalx: { width: 1129, height: 191, safeArea: { x: 220, y: 16, width: 889, height: 159 } },
             a4_letterhead: { width: 3307, height: 630, safeArea: { x: 0, y: 0, width: 3307, height: 630 } }
         };
 
@@ -269,11 +269,17 @@
 
             // draw safe area outline
             if (config.safeArea) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.setLineDash([10, 5]);
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.setLineDash([15, 10]);
+                ctx.lineWidth = 3;
                 ctx.strokeRect(config.safeArea.x, config.safeArea.y, config.safeArea.width, config.safeArea.height);
                 ctx.setLineDash([]);
+
+                // Add safe area label
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Safe Area', config.safeArea.x + config.safeArea.width / 2, config.safeArea.y + config.safeArea.height / 2);
             }
 
             if (uploadedLogo) {
@@ -283,9 +289,19 @@
                 const sizeMultiplier = logoSizePercent / 100;
                 const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
 
+                // Platform-specific logo sizing
+                let logoSizingFactor = sizeMultiplier;
+                if (platform === 'linkedin_company' || platform === 'pretalx') {
+                    // For narrow banners, use height-based sizing
+                    logoSizingFactor = Math.min(sizeMultiplier, 0.8);
+                } else if (platform === 'youtube') {
+                    // YouTube needs more conservative sizing
+                    logoSizingFactor = Math.min(sizeMultiplier, 0.6);
+                }
+
                 // Calculate max dimensions that fit in safe area
-                let maxWidth = safeArea.width * sizeMultiplier;
-                let maxHeight = safeArea.height * sizeMultiplier;
+                let maxWidth = safeArea.width * logoSizingFactor;
+                let maxHeight = safeArea.height * logoSizingFactor;
 
                 // Ensure logo maintains aspect ratio and fits within max dimensions
                 let logoWidth, logoHeight;
@@ -326,17 +342,31 @@
             svgContent += `<rect width="${width}" height="${height}" fill="${bgColor}"/>`;
             
             // safe area outline (optional, for reference)
-            svgContent += `<rect x="${safeArea.x}" y="${safeArea.y}" width="${safeArea.width}" height="${safeArea.height}" 
-                          fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="10,5"/>`;
+            svgContent += `<rect x="${safeArea.x}" y="${safeArea.y}" width="${safeArea.width}" height="${safeArea.height}"
+                          fill="none" stroke="rgba(0,0,0,0.8)" stroke-width="3" stroke-dasharray="15,10"/>`;
+
+            // Add safe area label for SVG
+            svgContent += `<text x="${safeArea.x + safeArea.width / 2}" y="${safeArea.y + safeArea.height / 2}"
+                          text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="rgba(0,0,0,0.8)">Safe Area</text>`;
             
             if (uploadedLogo && logoDataUrl) {
                 // Calculate logo size based on safe area dimensions with better scaling
                 const sizeMultiplier = logoSizePercent / 100;
                 const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
 
+                // Platform-specific logo sizing
+                let logoSizingFactor = sizeMultiplier;
+                if (platform === 'linkedin_company' || platform === 'pretalx') {
+                    // For narrow banners, use height-based sizing
+                    logoSizingFactor = Math.min(sizeMultiplier, 0.8);
+                } else if (platform === 'youtube') {
+                    // YouTube needs more conservative sizing
+                    logoSizingFactor = Math.min(sizeMultiplier, 0.6);
+                }
+
                 // Calculate max dimensions that fit in safe area
-                let maxWidth = safeArea.width * sizeMultiplier;
-                let maxHeight = safeArea.height * sizeMultiplier;
+                let maxWidth = safeArea.width * logoSizingFactor;
+                let maxHeight = safeArea.height * logoSizingFactor;
 
                 // Ensure logo maintains aspect ratio and fits within max dimensions
                 let logoWidth, logoHeight;
@@ -413,11 +443,17 @@
                     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
                     
                     if (config.safeArea) {
-                        tempCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                        tempCtx.setLineDash([10, 5]);
-                        tempCtx.lineWidth = 2;
+                        tempCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                        tempCtx.setLineDash([15, 10]);
+                        tempCtx.lineWidth = 3;
                         tempCtx.strokeRect(config.safeArea.x, config.safeArea.y, config.safeArea.width, config.safeArea.height);
                         tempCtx.setLineDash([]);
+
+                        // Add safe area label
+                        tempCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                        tempCtx.font = 'bold 16px Arial';
+                        tempCtx.textAlign = 'center';
+                        tempCtx.fillText('Safe Area', config.safeArea.x + config.safeArea.width / 2, config.safeArea.y + config.safeArea.height / 2);
                     }
                     
                     if (uploadedLogo) {
@@ -427,9 +463,19 @@
                         const sizeMultiplier = logoSizePercent / 100;
                         const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
 
+                        // Platform-specific logo sizing
+                        let logoSizingFactor = sizeMultiplier;
+                        if (platform === 'linkedin_company' || platform === 'pretalx') {
+                            // For narrow banners, use height-based sizing
+                            logoSizingFactor = Math.min(sizeMultiplier, 0.8);
+                        } else if (platform === 'youtube') {
+                            // YouTube needs more conservative sizing
+                            logoSizingFactor = Math.min(sizeMultiplier, 0.6);
+                        }
+
                         // Calculate max dimensions that fit in safe area
-                        let maxWidth = safeArea.width * sizeMultiplier;
-                        let maxHeight = safeArea.height * sizeMultiplier;
+                        let maxWidth = safeArea.width * logoSizingFactor;
+                        let maxHeight = safeArea.height * logoSizingFactor;
 
                         // Ensure logo maintains aspect ratio and fits within max dimensions
                         let logoWidth, logoHeight;
