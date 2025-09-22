@@ -152,8 +152,8 @@
             
             <div class="control-group">
                 <label for="logoSize">Logo Size (%):</label>
-                <input type="range" id="logoSize" min="10" max="80" value="30">
-                <span id="logoSizeValue">30%</span>
+                <input type="range" id="logoSize" min="20" max="90" value="60">
+                <span id="logoSizeValue">60%</span>
             </div>
         </div>
         
@@ -276,20 +276,26 @@
 
             if (uploadedLogo) {
                 const safeArea = config.safeArea || { x: 0, y: 0, width: canvas.width, height: canvas.height };
-                
-                const maxLogoSize = Math.min(safeArea.width, safeArea.height) * (logoSizePercent / 100);
+
+                // Calculate logo size based on safe area dimensions with better scaling
+                const sizeMultiplier = logoSizePercent / 100;
                 const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
-                
+
+                // Calculate max dimensions that fit in safe area
+                let maxWidth = safeArea.width * sizeMultiplier;
+                let maxHeight = safeArea.height * sizeMultiplier;
+
+                // Ensure logo maintains aspect ratio and fits within max dimensions
                 let logoWidth, logoHeight;
-                if (logoAspectRatio > 1) {
-                    logoWidth = maxLogoSize;
-                    logoHeight = maxLogoSize / logoAspectRatio;
+                if (maxWidth / logoAspectRatio <= maxHeight) {
+                    logoWidth = maxWidth;
+                    logoHeight = maxWidth / logoAspectRatio;
                 } else {
-                    logoHeight = maxLogoSize;
-                    logoWidth = maxLogoSize * logoAspectRatio;
+                    logoHeight = maxHeight;
+                    logoWidth = maxHeight * logoAspectRatio;
                 }
 
-                // center logo in safe area
+                // Center logo in safe area
                 const logoX = safeArea.x + (safeArea.width - logoWidth) / 2;
                 const logoY = safeArea.y + (safeArea.height - logoHeight) / 2;
 
@@ -322,22 +328,28 @@
                           fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="10,5"/>`;
             
             if (uploadedLogo && logoDataUrl) {
-                const maxLogoSize = Math.min(safeArea.width, safeArea.height) * (logoSizePercent / 100);
+                // Calculate logo size based on safe area dimensions with better scaling
+                const sizeMultiplier = logoSizePercent / 100;
                 const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
-                
+
+                // Calculate max dimensions that fit in safe area
+                let maxWidth = safeArea.width * sizeMultiplier;
+                let maxHeight = safeArea.height * sizeMultiplier;
+
+                // Ensure logo maintains aspect ratio and fits within max dimensions
                 let logoWidth, logoHeight;
-                if (logoAspectRatio > 1) {
-                    logoWidth = maxLogoSize;
-                    logoHeight = maxLogoSize / logoAspectRatio;
+                if (maxWidth / logoAspectRatio <= maxHeight) {
+                    logoWidth = maxWidth;
+                    logoHeight = maxWidth / logoAspectRatio;
                 } else {
-                    logoHeight = maxLogoSize;
-                    logoWidth = maxLogoSize * logoAspectRatio;
+                    logoHeight = maxHeight;
+                    logoWidth = maxHeight * logoAspectRatio;
                 }
 
                 const logoX = safeArea.x + (safeArea.width - logoWidth) / 2;
                 const logoY = safeArea.y + (safeArea.height - logoHeight) / 2;
 
-                svgContent += `<image x="${logoX}" y="${logoY}" width="${logoWidth}" height="${logoHeight}" 
+                svgContent += `<image x="${logoX}" y="${logoY}" width="${logoWidth}" height="${logoHeight}"
                               xlink:href="${logoDataUrl}"/>`;
             }
             
@@ -408,16 +420,23 @@
                     
                     if (uploadedLogo) {
                         const safeArea = config.safeArea || { x: 0, y: 0, width: tempCanvas.width, height: tempCanvas.height };
-                        const maxLogoSize = Math.min(safeArea.width, safeArea.height) * (logoSizePercent / 100);
+
+                        // Calculate logo size based on safe area dimensions with better scaling
+                        const sizeMultiplier = logoSizePercent / 100;
                         const logoAspectRatio = uploadedLogo.width / uploadedLogo.height;
-                        
+
+                        // Calculate max dimensions that fit in safe area
+                        let maxWidth = safeArea.width * sizeMultiplier;
+                        let maxHeight = safeArea.height * sizeMultiplier;
+
+                        // Ensure logo maintains aspect ratio and fits within max dimensions
                         let logoWidth, logoHeight;
-                        if (logoAspectRatio > 1) {
-                            logoWidth = maxLogoSize;
-                            logoHeight = maxLogoSize / logoAspectRatio;
+                        if (maxWidth / logoAspectRatio <= maxHeight) {
+                            logoWidth = maxWidth;
+                            logoHeight = maxWidth / logoAspectRatio;
                         } else {
-                            logoHeight = maxLogoSize;
-                            logoWidth = maxLogoSize * logoAspectRatio;
+                            logoHeight = maxHeight;
+                            logoWidth = maxHeight * logoAspectRatio;
                         }
 
                         const logoX = safeArea.x + (safeArea.width - logoWidth) / 2;
