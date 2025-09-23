@@ -16,10 +16,10 @@
             background: white;
             border-radius: 12px;
             padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(32,30,67,0.1);
         }
         h1 {
-            color: #333;
+            color: #201E43;
             text-align: center;
             margin-bottom: 30px;
         }
@@ -33,24 +33,24 @@
             background: #f9f9f9;
             padding: 20px;
             border-radius: 8px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #508C9B;
         }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #555;
+            color: #134B70;
         }
         select, input, button {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #508C9B;
             border-radius: 6px;
             font-size: 14px;
         }
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #134B70 0%, #201E43 100%);
+            color: #EEEEEE;
             border: none;
             cursor: pointer;
             font-weight: 600;
@@ -63,11 +63,11 @@
             transition: border-color 0.2s ease, transform 0.2s ease;
         }
         .preset-color:hover {
-            border-color: #999 !important;
+            border-color: #134B70 !important;
             transform: scale(1.1);
         }
         .preset-color.active {
-            border-color: #333 !important;
+            border-color: #201E43 !important;
             border-width: 3px !important;
         }
         .canvas-container {
@@ -76,19 +76,19 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            border: 2px dashed #ddd;
+            border: 2px dashed #508C9B;
         }
         canvas {
             max-width: 100%;
-            border: 1px solid #ccc;
+            border: 1px solid #134B70;
             border-radius: 4px;
         }
         .download-btn {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            background: linear-gradient(135deg, #508C9B 0%, #134B70 100%);
             margin-top: 15px;
         }
         .download-all-btn {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            background: linear-gradient(135deg, #201E43 0%, #134B70 100%);
             margin-top: 15px;
             margin-left: 10px;
         }
@@ -101,19 +101,19 @@
             margin-left: 10px;
         }
         .safe-area-info {
-            background: #e8f4fd;
-            border: 1px solid #bee5eb;
+            background: #EEEEEE;
+            border: 1px solid #508C9B;
             border-radius: 6px;
             padding: 15px;
             margin-top: 20px;
             font-size: 14px;
-            color: #0c5460;
+            color: #201E43;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎨 Social Media Banner Generator</h1>
+        <h1>Social Media Banner Generator</h1>
         
         <div class="controls">
             <div class="control-group">
@@ -148,7 +148,7 @@
                     <button type="button" class="preset-color" data-color="#edd9db" style="background: #edd9db; border: 2px solid #ddd; border-radius: 6px; width: 40px; height: 30px; cursor: pointer;"></button>
                     <button type="button" class="preset-color" data-color="#151f38" style="background: #151f38; border: 2px solid #ddd; border-radius: 6px; width: 40px; height: 30px; cursor: pointer;"></button>
                 </div>
-                <input type="color" id="bgColor" value="#f5e5d6">
+                <input type="color" id="bgColor" value="#EEEEEE">
             </div>
             
             <div class="control-group">
@@ -171,10 +171,10 @@
             </div>
             <br>
             <button class="download-btn" onclick="downloadBanner()" style="display:none;" id="downloadBtn">
-                📥 Download Banner
+Download Banner
             </button>
             <button class="download-all-btn" onclick="downloadAllBanners()" style="display:none;" id="downloadAllBtn">
-                📦 Download All Platforms
+Download All Platforms
             </button>
         </div>
         
@@ -269,17 +269,30 @@
 
             // draw safe area outline (only if showSafeArea is true)
             if (showSafeArea && config.safeArea) {
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-                ctx.setLineDash([15, 10]);
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = 'rgba(32, 30, 67, 0.8)';
+                ctx.setLineDash([20, 15]);
+                ctx.lineWidth = 2;
                 ctx.strokeRect(config.safeArea.x, config.safeArea.y, config.safeArea.width, config.safeArea.height);
                 ctx.setLineDash([]);
 
-                // Add safe area label
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-                ctx.font = 'bold 16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Safe Area', config.safeArea.x + config.safeArea.width / 2, config.safeArea.y + config.safeArea.height / 2);
+                // Add safe area label near the top-left corner
+                ctx.fillStyle = 'rgba(32, 30, 67, 0.9)';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+
+                // Add background for text
+                const textMetrics = ctx.measureText('-- Safe Area --');
+                const textWidth = textMetrics.width;
+                const textHeight = 16;
+                const textX = config.safeArea.x + 10;
+                const textY = config.safeArea.y + 10;
+
+                ctx.fillStyle = 'rgba(238, 238, 238, 0.9)';
+                ctx.fillRect(textX - 5, textY - 2, textWidth + 10, textHeight + 4);
+
+                ctx.fillStyle = 'rgba(32, 30, 67, 0.9)';
+                ctx.fillText('-- Safe Area --', textX, textY);
             }
 
             if (uploadedLogo) {
@@ -549,8 +562,8 @@
             canvas.height = 600;
             
             const gradient = ctx.createRadialGradient(300, 300, 0, 300, 300, 300);
-            gradient.addColorStop(0, '#667eea');
-            gradient.addColorStop(1, '#764ba2');
+            gradient.addColorStop(0, '#134B70');
+            gradient.addColorStop(1, '#201E43');
             
             ctx.fillStyle = gradient;
             ctx.beginPath();
